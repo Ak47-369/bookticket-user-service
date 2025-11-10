@@ -8,6 +8,7 @@ import com.bookticket.user_service.repository.UserRepository;
 import com.bookticket.user_service.utils.JwtUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -83,6 +84,8 @@ public class UserService {
         return new JwtResponse(jwt, expiresIn);
     }
 
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN') or #email == authentication.principal.username")
     public void deleteUserByEmail(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
         userRepository.delete(user);

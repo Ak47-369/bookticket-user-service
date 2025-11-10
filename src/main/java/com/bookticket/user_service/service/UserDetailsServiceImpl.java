@@ -1,6 +1,7 @@
 package com.bookticket.user_service.service;
 
 import com.bookticket.user_service.entity.User;
+import com.bookticket.user_service.exception.ResourceNotFoundException;
 import com.bookticket.user_service.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
