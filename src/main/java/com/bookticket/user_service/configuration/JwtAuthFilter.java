@@ -30,6 +30,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
+        // TO DO - Apply auth filter only on login and register
+        // Rest of the APIs authentication is done by api gateway
+        // Use - X-User-Id and X-User-Roles headers [To Set Authentication]
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String subject;
