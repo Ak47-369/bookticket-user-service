@@ -39,3 +39,7 @@ management:
   endpoint:
     health:
       show-details: always
+app:
+  jwt:
+    jwt-secret: ${JWT_SECRET}
+    jwt-expiration: ${JWT_EXPIRY_TIME}

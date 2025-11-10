@@ -5,8 +5,10 @@ import com.bookticket.user_service.entity.User;
 import com.bookticket.user_service.enums.UserRole;
 import com.bookticket.user_service.exception.ResourceNotFoundException;
 import com.bookticket.user_service.repository.UserRepository;
+import com.bookticket.user_service.utils.JwtUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -15,77 +17,75 @@ import java.util.Set;
 @Slf4j
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtils = jwtUtils;
     }
 
     @Transactional
-    public String createUser(CreateUserRequest createUserRequest) {
-        try {
-            User user = new User();
-            user.setUsername(createUserRequest.username());
-            user.setEmail(createUserRequest.email());
-            user.setPassword(createUserRequest.password());
-//            user.setPassword(passwordEncoder.encode(createUserRequest.password()));
-            user.setRoles(Set.of(UserRole.USER));
-            User savedUser = userRepository.save(user);
-            log.info("User created Successfully: {}", user.getUsername());
-            // TO DO - Generate JWT token
-//            return new LoginResponse(user);
-            return "User Created Successfully" + savedUser;
-        } catch (Exception e) {
-            log.error("Error creating user: {}", e.getMessage());
-            throw new RuntimeException(e);
+    public UserSummary createUser(CreateUserRequest createUserRequest) {
+        String lowerCaseEmail = createUserRequest.email().toLowerCase();
+        if (userRepository.existsByUsername(createUserRequest.username())) {
+            throw new IllegalStateException("Username already exists");
         }
+        if (userRepository.existsByEmail(lowerCaseEmail)) {
+            throw new IllegalStateException("Email already exists");
+        }
+
+        User user = new User();
+        user.setUsername(createUserRequest.username());
+        user.setEmail(lowerCaseEmail);
+        user.setPassword(passwordEncoder.encode(createUserRequest.password()));
+        user.setRoles(Set.of(UserRole.USER));
+        User savedUser = userRepository.save(user);
+        log.info("User created Successfully: {}", user.getUsername());
+        return UserSummary.fromUser(savedUser);
     }
 
-    public LoginResponse loginUser(LoginRequest loginRequest) {
-        return null;
-    }
-
-    public UserSummary getUserByUsername(String username){
-        log.info("Getting user by username: {}", username);
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        return UserSummary.builder()
-                .id(user.getId().toString())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .roles(user.getRoles().stream().map(UserRole::name).toList())
-                .build();
+    public UserSummary getUserByEmail(String email){
+        log.info("Getting user by Email: {}", email);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+        return UserSummary.fromUser(user);
     }
 
     @Transactional
-    public UserSummary updateUserByUsername(String username, UpdateUserRequest updateUserRequest) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User ", "username", username));
+    public JwtResponse updateUserByEmail(String email, UpdateUserRequest updateUserRequest) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User ", "email", email));
 
-        if(updateUserRequest.username() != null && !user.getUsername().equals(updateUserRequest.username()) ){
+        if (updateUserRequest.username() != null && !user.getUsername().equals(updateUserRequest.username())) {
+            if (userRepository.existsByUsername(updateUserRequest.username())) {
+                throw new IllegalStateException("Username already exists");
+            }
             user.setUsername(updateUserRequest.username());
         }
 
-        if(updateUserRequest.email() != null && !user.getEmail().equals(updateUserRequest.email()) ){
-            user.setEmail(updateUserRequest.email());
+        if (updateUserRequest.email() != null && !user.getEmail().equals(updateUserRequest.email())) {
+            String lowerCaseEmail = updateUserRequest.email().toLowerCase();
+            if (userRepository.existsByEmail(lowerCaseEmail)) {
+                throw new IllegalStateException("Email already exists");
+            }
+            user.setEmail(lowerCaseEmail);
         }
 
-        User savedUser = null;
-        try {
-            savedUser = userRepository.save(user);
-            log.info("User updated Successfully: {}", user.getUsername());
-        } catch (Exception e) {
-            log.error("Error updating user: {}", e.getMessage());
-            throw new RuntimeException(e);
-        }
-        return UserSummary.builder()
-                .id(savedUser.getId().toString())
-                .username(savedUser.getUsername())
-                .email(savedUser.getEmail())
-                .roles(savedUser.getRoles().stream().map(UserRole::name).toList())
-                .build();
+        // TODO - Add password update
+
+        User savedUser = userRepository.save(user);
+        log.info("User updated Successfully: {}", savedUser.getUsername());
+
+        final CustomUserDetails userDetails = new CustomUserDetails(savedUser);
+        final String jwt = jwtUtils.generateToken(userDetails);
+        final long expiresIn = jwtUtils.extractExpiration(jwt).getTime();
+
+        return new JwtResponse(jwt, expiresIn);
     }
 
-    public void deleteUserByUsername(String username) {
-        Long id = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "username", username)).getId();
-        userRepository.deleteById(id);
-        log.info("User deleted Successfully: {}", username);
+    public void deleteUserByEmail(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+        userRepository.delete(user);
+        log.info("User deleted Successfully: {}", email);
     }
 }
