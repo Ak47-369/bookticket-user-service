@@ -1,5 +1,8 @@
 package com.bookticket.user_service.dto;
 
+import lombok.Builder;
+
+@Builder
 public record JwtResponse(
         String token,
         String type,

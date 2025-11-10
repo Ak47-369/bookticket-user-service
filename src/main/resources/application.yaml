@@ -5,6 +5,9 @@ spring:
     jpa:
       repositories:
         enabled: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
   cloud:
     config:
       enabled: false

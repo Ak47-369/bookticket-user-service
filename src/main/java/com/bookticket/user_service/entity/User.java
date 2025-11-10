@@ -50,7 +50,4 @@ public class User {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDate updatedAt;
-
-    @Column(updatable = false)
-    private String createdBy;
 }
