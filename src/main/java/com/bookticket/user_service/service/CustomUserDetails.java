@@ -22,8 +22,8 @@ public class CustomUserDetails implements UserDetails {
         this.username = user.getEmail(); // Using email as the username for authentication
         this.password = user.getPassword();
         this.authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
-                .collect(Collectors.toList());
+                .map(role -> new SimpleGrantedAuthority( role.name()))
+                .toList();
     }
 
     @Override
