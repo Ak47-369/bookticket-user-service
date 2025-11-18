@@ -23,6 +23,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
+    @GetMapping("/{userId}/email")
+    public ResponseEntity<String> getEmailById(@PathVariable Long userId) {
+        return ResponseEntity.ok(userService.getUserById(userId).getEmail());
+    }
+
     @PutMapping("/update")
     public ResponseEntity<JwtResponse> updateUserByUsername(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody UpdateUserRequest updateUserRequest) {
         String email = userDetails.getUsername();

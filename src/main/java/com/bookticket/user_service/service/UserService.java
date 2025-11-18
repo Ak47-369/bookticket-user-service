@@ -41,7 +41,7 @@ public class UserService {
         user.setUsername(createUserRequest.username());
         user.setEmail(lowerCaseEmail);
         user.setPassword(passwordEncoder.encode(createUserRequest.password()));
-        user.setRoles(Set.of(UserRole.USER));
+        user.setRoles(Set.of(UserRole.USER, UserRole.ADMIN));// Temp Changes
         User savedUser = userRepository.save(user);
         log.info("User created Successfully: {}", user.getUsername());
         return UserSummary.fromUser(savedUser);
@@ -51,6 +51,10 @@ public class UserService {
         log.info("Getting user by Email: {}", email);
         User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
         return UserSummary.fromUser(user);
+    }
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
     }
 
     @Transactional
