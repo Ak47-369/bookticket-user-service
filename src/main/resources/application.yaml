@@ -1,45 +1,5 @@
 spring:
   application:
     name: user-service
-  data:
-    jpa:
-      repositories:
-        enabled: true
-  jackson:
-    deserialization:
-      fail-on-unknown-properties: false
-  cloud:
-    config:
-      enabled: false
-  datasource:
-    url: jdbc:postgresql://${NEON_HOST}/${NEON_DB}?sslmode=require&channelBinding=require
-    username: ${NEON_USER}
-    password: ${NEON_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-server:
-  port: 8081
-logging:
-  level:
-    com.bookticket.user_service: DEBUG
-management:
-  server:
-    port: 9091
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: always
-app:
-  jwt:
-    jwt-secret: ${JWT_SECRET}
-    jwt-expiration: ${JWT_EXPIRY_TIME}
+  config:
+    import: configserver:http://localhost:8888
