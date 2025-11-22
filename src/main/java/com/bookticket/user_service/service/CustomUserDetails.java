@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public class CustomUserDetails implements UserDetails {
     private final Long id;
     private final String username;
+    private final String userIdAndName;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
@@ -21,6 +22,7 @@ public class CustomUserDetails implements UserDetails {
         this.id = user.getId();
         this.username = user.getEmail(); // Using email as the username for authentication
         this.password = user.getPassword();
+        this.userIdAndName = user.getId() + "_" + user.getUsername();
         this.authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority( role.name()))
                 .toList();

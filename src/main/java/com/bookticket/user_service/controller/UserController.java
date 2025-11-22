@@ -46,6 +46,26 @@ public class UserController {
                     responseCode = "401",
                     description = "Unauthorized - Authentication token is missing or invalid",
                     content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "503",
+                    description = "Service unavailable",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "504",
+                    description = "Gateway timeout",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "429",
+                    description = "Too many requests",
+                    content = @Content
             )
     })
     @GetMapping("/me")
@@ -72,6 +92,26 @@ public class UserController {
             @ApiResponse(
                     responseCode = "404",
                     description = "User not found",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "503",
+                    description = "Service unavailable",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "504",
+                    description = "Gateway timeout",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "429",
+                    description = "Too many requests",
                     content = @Content
             )
     })
@@ -119,6 +159,26 @@ public class UserController {
                     responseCode = "409",
                     description = "Email already in use",
                     content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "503",
+                    description = "Service unavailable",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "504",
+                    description = "Gateway timeout",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "429",
+                    description = "Too many requests",
+                    content = @Content
             )
     })
     @PutMapping("/update")
@@ -144,6 +204,31 @@ public class UserController {
             @ApiResponse(
                     responseCode = "401",
                     description = "Unauthorized - Authentication token is missing or invalid",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "503",
+                    description = "Service unavailable",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "504",
+                    description = "Gateway timeout",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "429",
+                    description = "Too many requests",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - Insufficient privileges",
                     content = @Content
             )
     })
