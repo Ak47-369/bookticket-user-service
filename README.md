@@ -36,7 +36,18 @@ The **User Service** is a core microservice responsible for managing all aspects
 
 ## API Endpoints
 
-The service exposes two main sets of endpoints, which are routed through the API Gateway:
+The service's endpoints are exposed through the API Gateway.
 
--   `/api/v1/auth/**`: For public operations like user registration and login.
--   `/api/v1/users/**`: For secured operations like fetching the current user's profile (`/me`).
+### Public Authentication Endpoints
+These endpoints are used for user registration and login and are publicly accessible.
+
+-   `POST /api/v1/auth/register`: Creates a new user account.
+-   `POST /api/v1/auth/login`: Authenticates a user with their email and password and returns a JWT upon success.
+
+### Secured User Endpoints
+These endpoints require a valid JWT in the `Authorization` header for access.
+
+-   `GET /api/v1/users/me`: Retrieves the profile information for the currently authenticated user.
+-   `GET /api/v1/users/{id}`: Retrieves the public profile information for any user by their ID.
+-   `GET /api/v1/users`: Fetches a list of all users. (Requires `ADMIN` role).
+-   `DELETE /api/v1/users/{id}`: Deletes a user account. (Requires `ADMIN` role).
